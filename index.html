@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>sample</title>
+  <meta name="robots" content="noindex">
+  <meta name="viewport" content="width=device-width">
+  <style>
+.button {
+  border-radius:5px;
+  border:solid 1px #000;
+  padding:3px 5px;
+  background-color:#eee;
+  text-decoration: none;
+  color: #000;
+  font-size:14px;
+}
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+function sound() {
+  let sel = document.getSelection().toString().trim()  // 選択された文字列を文字列に変換して保存
+  let site_url = `https://www.vocabulary.com/dictionary/${sel}`  // 音声ファイルのIDをとってくるサイト
+  $.ajax({
+    type: 'GET',  // GET方式で（POSTでもOK）
+    data: { url: site_url },  // jsonの形でurlを送信
+    dataType: 'json',
+    url: './get.php',  // 同じ階層のget.phpに送信
+  }).done(function(data) {  // 通信成功
+    let audio_url = `https://audio.vocab.com/1.0/us/${data.music_id}.mp3`  // 音声URL
+    let audio_elem = document.createElement('audio')  // audioタグを生成
+    audio_elem.setAttribute('src', audio_url)  // URLをセット
+    let iv_len = 500 * sel.length + 500  // 再生時間（今回は文字数 * 0.1s + 0.5s）
+    let loop_counter = 0;  // 再生回数のカウンター
+    iv = setInterval(() => {  // ループ
+      audio_elem.play()  // audioを再生
+      console.log(++loop_counter)
+      if (loop_counter == 2) {
+        clearInterval(iv)  // ループ2回目でループを抜ける
+      }
+    }, iv_len)
+  }).fail(function(data) {  // 通信失敗
+    console.log('err', data)
+  })
+}
+  </script>
+</head>
+
+<body>
+<div id="word">
+  hello win vocabulary
+</div>
+
+<div class="search">
+  <a href="javascript:sound()" class="button">Sound</a>
+</div>
+</body>
+
+</html>
